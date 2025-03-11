@@ -30,16 +30,23 @@ def send_packets_to_emulator(serial_port):
             ser.write(f"{packet}\n".encode())  # Send the packet followed by a newline character
             time.sleep(1)  # Wait for a while before sending the next packet
 
+def main(serial_port):
+    try:
+        # Create a thread to read echo responses from the emulator
+        read_thread = threading.Thread(target=read_echo_response, args=(serial_port,))
+        read_thread.daemon = True  # Allow thread to exit when the main program exits
+        read_thread.start()
+
+        # Send packets to the emulator in the main thread
+        send_packets_to_emulator(serial_port)
+
+        read_thread.join()
+    except KeyboardInterrupt:
+        print("Terminated by user!")
+
 if __name__ == '__main__':
     # Define the virtual port where the client connects (Linux example)
     serial_port = '/tmp/ttyV1'  # Change this to your actual virtual port (e.g., COM5 for Windows)
 
-    # Create a thread to read echo responses from the emulator
-    read_thread = threading.Thread(target=read_echo_response, args=(serial_port,))
-    read_thread.daemon = True  # Allow thread to exit when the main program exits
-    read_thread.start()
+    main(serial_port)
 
-    # Send packets to the emulator in the main thread
-    send_packets_to_emulator(serial_port)
-
-    read_thread.join()

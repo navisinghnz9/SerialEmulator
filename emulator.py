@@ -23,7 +23,11 @@ def listen_on_virtual_serial_port(serial_port):
                 print(f"Sent packet: Echo: {decoded_data}")
             time.sleep(1)
 
+def main(serial_port):
+    try:
+        listen_on_virtual_serial_port(serial_port)
+    except KeyboardInterrupt:
+        print("[EMULATOR] :: Terminated by user!")
+
 if __name__ == '__main__':
-    # Replace with your virtual port (Linux example)
-    serial_port = '/tmp/ttyV0'  # Emulator listens here
-    listen_on_virtual_serial_port(serial_port)
+    main("/tmp/ttyV0")
